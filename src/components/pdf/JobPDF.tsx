@@ -106,6 +106,23 @@ const styles = StyleSheet.create({
   colPrice: { width: '15%', textAlign: 'right' },
   colTotal: { width: '20%', textAlign: 'right' },
 
+  termsContainer: {
+    marginTop: 40,
+    width: '60%',
+  },
+  signatureContainer: {
+    marginTop: 60,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  signatureLine: {
+    width: '40%',
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    textAlign: 'center',
+    paddingTop: 5,
+  },
+
   totalsContainer: {
     marginTop: 30,
     flexDirection: 'row',
@@ -224,8 +241,18 @@ export const JobPDF = ({ job, client, settings }: JobPDFProps) => {
           ))}
         </View>
 
-        {/* Totals */}
-        <View style={styles.totalsContainer}>
+        {/* Totals & Terms */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={styles.termsContainer}>
+            <Text style={styles.sectionTitle}>Términos y Condiciones</Text>
+            <Text style={{ fontSize: 8, color: '#666' }}>
+              1. Esta cotización tiene una validez de 15 días naturales.{"\n"}
+              2. Los precios están sujetos a cambios sin previo aviso.{"\n"}
+              3. Se requiere un anticipo del 50% para iniciar el trabajo.{"\n"}
+              4. El tiempo de entrega estimado se acordará una vez recibido el anticipo.
+            </Text>
+          </View>
+
           <View style={styles.totalsBox}>
             <View style={styles.totalRow}>
               <Text style={{ color: '#999' }}>Subtotal:</Text>
@@ -247,6 +274,20 @@ export const JobPDF = ({ job, client, settings }: JobPDFProps) => {
               <Text>Total:</Text>
               <Text>{formatCurrency(totals.total)}</Text>
             </View>
+          </View>
+        </View>
+
+        {/* Signature Area */}
+        <View style={styles.signatureContainer}>
+          <View style={styles.signatureLine}>
+            <Text style={styles.label}>Aceptado por el Cliente</Text>
+            <Text style={{ marginTop: 20 }}>_______________________</Text>
+            <Text style={{ fontSize: 8, marginTop: 5 }}>Firma y Fecha</Text>
+          </View>
+          <View style={styles.signatureLine}>
+            <Text style={styles.label}>Emitido por {settings.companyName}</Text>
+            <Text style={{ marginTop: 20 }}>_______________________</Text>
+            <Text style={{ fontSize: 8, marginTop: 5 }}>Sello y Firma</Text>
           </View>
         </View>
 

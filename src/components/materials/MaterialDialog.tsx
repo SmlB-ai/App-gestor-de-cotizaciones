@@ -32,13 +32,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Package, Link as LinkIcon, DollarSign, Ruler, ImageIcon } from "lucide-react";
+import { Package, Link as LinkIcon, DollarSign, Ruler, ImageIcon, X, Upload } from "lucide-react";
+import { fileToBase64 } from "@/lib/file-utils";
 
 const formSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   category: z.string().min(1, "Selecciona una categoría"),
   price: z.any().transform(v => Number(v)),
-  link: z.string().url("Debe ser una URL válida").optional().or(z.literal("")),
+  link: z.string().optional().or(z.literal("")),
   image: z.string().optional(),
   unit: z.string().min(1, "Selecciona una unidad"),
   yield: z.any().transform(v => Number(v)),
@@ -234,22 +235,48 @@ export function MaterialDialog({ open, onOpenChange, material }: MaterialDialogP
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL de Imagen</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <ImageIcon className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
-                      <Input placeholder="URL de la imagen" className="pl-9 rounded-xl" {...field} />
+            <div className="space-y-2">
+              <FormLabel>Imagen del Material</FormLabel>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border-2 border-dashed border-zinc-200 dark:border-zinc-700 flex items-center justify-center overflow-hidden relative group">
+                  {form.watch("image") ? (
+                    <>
+                      <img src={form.watch("image")} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => form.setValue("image", "")}
+                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <X className="w-5 h-5 text-white" />
+                      </button>
+                    </>
+                  ) : (
+                    <ImageIcon className="w-6 h-6 text-zinc-300" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="cursor-pointer">
+                    <div className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+                      <Upload className="w-4 h-4" />
+                      Subir imagen local
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const base64 = await fileToBase64(file);
+                          form.setValue("image", base64);
+                        }
+                      }}
+                    />
+                  </label>
+                  <p className="text-[10px] text-zinc-500 mt-1">PNG, JPG o WEBP. Máx 2MB recomendado.</p>
+                </div>
+              </div>
+            </div>
             <DialogFooter className="pt-4">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="rounded-xl">
                 Cancelar

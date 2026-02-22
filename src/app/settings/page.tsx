@@ -19,7 +19,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Building2, Mail, Phone, MapPin, CreditCard, ImageIcon, Save } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, CreditCard, ImageIcon, Save, X, Upload } from "lucide-react";
+import { fileToBase64 } from "@/lib/file-utils";
 
 const formSchema = z.object({
   companyName: z.string().min(2, "Mínimo 2 caracteres"),
@@ -164,25 +165,52 @@ export default function SettingsPage() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="logo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>URL del Logo</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <ImageIcon className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
-                        <Input placeholder="https://..." className="pl-9 rounded-xl" {...field} />
+              <div className="space-y-4">
+                <FormLabel>Logo de la Empresa</FormLabel>
+                <div className="flex items-center gap-6">
+                  <div className="w-32 h-32 rounded-3xl bg-zinc-100 dark:bg-zinc-800 border-2 border-dashed border-zinc-200 dark:border-zinc-700 flex items-center justify-center overflow-hidden relative group transition-all">
+                    {form.watch("logo") ? (
+                      <>
+                        <img src={form.watch("logo")} alt="Logo Preview" className="w-full h-full object-contain p-2" />
+                        <button
+                          type="button"
+                          onClick={() => form.setValue("logo", "")}
+                          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                        >
+                          <X className="w-6 h-6 text-white" />
+                        </button>
+                      </>
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-zinc-300" />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="cursor-pointer">
+                      <div className="inline-flex items-center px-4 py-2 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-sm font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Seleccionar Archivo
                       </div>
-                    </FormControl>
-                    <FormDescription>
-                      Proporciona una URL de imagen (PNG/JPG) para que aparezca en el PDF.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            try {
+                              const base64 = await fileToBase64(file);
+                              form.setValue("logo", base64);
+                            } catch (err) {
+                              toast.error("Error al procesar la imagen");
+                            }
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="text-xs text-zinc-500">Se recomienda formato PNG transparente y tamaño cuadrado.</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 

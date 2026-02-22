@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "GestorPro - Gestión de Materiales y Clientes",
   description: "App profesional para gestión de materiales, clientes y cotizaciones",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
